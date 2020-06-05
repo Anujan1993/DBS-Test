@@ -1,6 +1,7 @@
 package com.example.dbs.adaper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dbs.R;
+import com.example.dbs.UI.FullArticleView;
 import com.example.dbs.response.ListArticle;
 import com.squareup.picasso.Picasso;
 
@@ -41,7 +43,11 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
         holder.textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(context, FullArticleView.class);
+                intent.putExtra("Title", data1.get(position).getTitle());
+                intent.putExtra("Url", String.valueOf(data1.get(position).getAvatar()));
+                intent.putExtra("PostID",String.valueOf( data1.get(position).getId().intValue()));
+                context.startActivity(intent);
             }
         });
     }
