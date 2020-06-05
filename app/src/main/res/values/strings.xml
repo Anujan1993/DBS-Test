@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">DBS</string>
+    <string name="Open">open</string>
+    <string name="close">close</string>
 </resources>
