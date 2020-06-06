@@ -14,14 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.dbs.R;
 import com.example.dbs.adaper.PostAdaper;
 import com.example.dbs.api.NetworkClient;
 import com.example.dbs.api.RequestInterface;
 import com.example.dbs.entitys.Articles;
+import com.example.dbs.entitys.SingleArticles;
+import com.example.dbs.response.FullArticle;
 import com.example.dbs.response.ListArticle;
 
 import java.util.ArrayList;
@@ -36,13 +36,14 @@ public class ListFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<ListArticle> Data ;
     private int postID;
-    private int userID;
     private String Title;
     private String Body;
-    private int Date;
+    private String text;
+    private Integer Date;
     private String imgUrl;
     private Articles articles;
     private RequestInterface requestInterface;
+    private SingleArticles singleArticles;
 
     @Nullable
     @Override
@@ -77,6 +78,8 @@ public class ListFragment extends Fragment {
                // Toast.makeText(getActivity(), "Request Success", Toast.LENGTH_LONG).show();
                 Articles article= new Articles();
                 article.deleteAll(Articles.class);
+                SingleArticles singleArticle = new SingleArticles();
+                singleArticle.deleteAll(SingleArticles.class);
                 for(int i = 0; i<response.body().size(); i++) {
                     postID = response.body().get(i).getId().intValue();
                     Title = String.valueOf(response.body().get(i).getTitle());
@@ -91,6 +94,21 @@ public class ListFragment extends Fragment {
                     articles.setShort_description(Body);
                     articles.setAvatar(imgUrl);
                     articles.save();
+                    Call<FullArticle> calls = requestInterface.groupList(String.valueOf(postID));
+                    calls.enqueue(new Callback<FullArticle>() {
+                        @Override
+                        public void onResponse(Call<FullArticle> calls, Response<FullArticle> responses) {
+                            text = responses.body().getText();
+                            singleArticles = new SingleArticles();
+                            singleArticles.setArticleID(postID);
+                            singleArticles.setText(text);
+                            singleArticles.save();
+                        }
+                        @Override
+                        public void onFailure(Call<FullArticle> calls, Throwable t) {
+                            //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
                 Data.addAll(response.body());
                 PostAdaper postAdaper = new PostAdaper(getActivity(),Data);

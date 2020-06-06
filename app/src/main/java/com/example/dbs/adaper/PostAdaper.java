@@ -2,6 +2,7 @@ package com.example.dbs.adaper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,11 @@ import com.example.dbs.UI.FullArticleView;
 import com.example.dbs.response.ListArticle;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>{
     private ArrayList<ListArticle> data1;
@@ -36,7 +41,8 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
     @Override
     public void onBindViewHolder(@NonNull postViewAdapter holder, final int position) {
         holder.textView.setText(data1.get(position).getTitle());
-        holder.date.setText(String.valueOf(data1.get(position).getLastUpdate().intValue()));
+        String resultDate = getDate(String.valueOf(data1.get(position).getLastUpdate().intValue()));
+        holder.date.setText(resultDate);
         holder.shortDec.setText(data1.get(position).getShortDescription());
         String imageUri = data1.get(position).getAvatar();
         Picasso.get().load(imageUri).into(holder.imageView);
@@ -56,6 +62,12 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
         return data1.size();
     }
 
+    private String getDate(String time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(Long.parseLong(time));
+        String date = DateFormat.format("yyyy-MM-dd ", cal).toString();
+        return date;
+    }
     public class postViewAdapter extends RecyclerView.ViewHolder{
         private TextView textView;
         private  TextView date;

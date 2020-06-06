@@ -1,8 +1,10 @@
 package com.example.dbs.UI;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,10 +19,15 @@ import android.widget.Toast;
 import com.example.dbs.R;
 import com.example.dbs.api.NetworkClient;
 import com.example.dbs.api.RequestInterface;
+import com.example.dbs.entitys.Articles;
+import com.example.dbs.entitys.SingleArticles;
 import com.example.dbs.response.FullArticle;
+import com.orm.query.Condition;
+import com.orm.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,8 +49,8 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
     private  String title2;
     private ArrayList<Object> newARRAY;
     private RequestInterface requestUserInterface;
-    private String PID;
     private String text;
+    private Long singleArticleID;
     private FrameLayout viewLay;
     private FrameLayout editLay;
     private androidx.appcompat.widget.Toolbar toolbar;
@@ -118,8 +125,13 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
         });
     }
     private void noIternet() {
+        List<SingleArticles> singleArticles = SingleArticles.findWithQuery
+                (SingleArticles.class, "Select * from SingleArticles where articleID = ?", articleID);
+        singleArticleID = singleArticles.get(Integer.parseInt(articleID)).getID();
+        text = singleArticles.get(Integer.parseInt(articleID)).getText();
+        boDy.setText(String.valueOf(text));
+        boDy2.setText(String.valueOf(text));
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -138,6 +150,24 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                 header.setText(title);
                 break;
             case R.id.Save:
+                SingleArticles singleArticl = SingleArticles.findById(SingleArticles.class, singleArticleID);
+                singleArticl.setText(String.valueOf(boDy2));
+                singleArticl.save();
+                String time= String.valueOf(System.currentTimeMillis());
+                Articles articles1 = Articles.find(Articles.class, "articleID ="+singleArticleID).get(0);
+                articles1.setLast_update(Integer.valueOf(time));
+                singleArticl.save();
+
+                AlertDialog alertDialog = new AlertDialog.Builder(FullArticleView.this).create();
+                alertDialog.setTitle("Save Status");
+                alertDialog.setMessage("Your Data Saved Successfully");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                alertDialog.show();
                 edit.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.GONE);
                 viewLay.setVisibility(View.VISIBLE);
