@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,7 +64,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+        if (item.getItemId() == R.id.home){
+            fragmentManager = getSupportFragmentManager();
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.container_fragment, new ListFragment());
+            fragmentTransaction.commit();
+        }
+        if (item.getItemId() == R.id.test){
+            Intent intent = new Intent(MainActivity.this, FullArticleView.class);
+            startActivity(intent);
+        }
         return false;
     }
 }
