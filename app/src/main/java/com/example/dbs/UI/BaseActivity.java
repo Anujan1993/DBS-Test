@@ -3,6 +3,8 @@ package com.example.dbs.UI;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -15,15 +17,20 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void dialogBoxBase(String title, String BodyMessage){
-        AlertDialog alertDialog = new AlertDialog.Builder(BaseActivity.this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(BodyMessage);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
+        /*** Get Articles for list ***/
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setNegativeButton("NO", null)
+                .setTitle(title)
+                .setMessage(BodyMessage)
+                .show();
+
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 }

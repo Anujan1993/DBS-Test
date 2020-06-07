@@ -4,7 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Column;
 import com.orm.dsl.Unique;
 
-public class Articles extends SugarRecord {
+public class Article extends SugarRecord {
     @Unique
     @Column(name = "ID")
     private long ID;
@@ -19,10 +19,10 @@ public class Articles extends SugarRecord {
     @Column(name = "avatar")
     private String avatar;
 
-    public Articles() {
+    public Article() {
     }
 
-    public Articles(Integer articleID, String title, Integer last_update, String short_description, String avatar) {
+    public Article(Integer articleID, String title, Integer last_update, String short_description, String avatar) {
         this.articleID = articleID;
         this.title = title;
         this.last_update = last_update;

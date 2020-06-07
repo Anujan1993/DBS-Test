@@ -4,7 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Column;
 import com.orm.dsl.Unique;
 
-public class SingleArticles extends SugarRecord {
+public class SingleArticle extends SugarRecord {
     @Unique
     @Column(name = "ID")
     private long ID;
@@ -13,9 +13,9 @@ public class SingleArticles extends SugarRecord {
     @Column(name = "test")
     private String text;
 
-    public SingleArticles() {
+    public SingleArticle() {
     }
-    public SingleArticles(Integer articleID, String text) {
+    public SingleArticle(Integer articleID, String text) {
         this.articleID = articleID;
         this.text = text;
     }

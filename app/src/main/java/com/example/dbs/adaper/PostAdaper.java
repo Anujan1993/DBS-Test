@@ -61,7 +61,7 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
     public int getItemCount() {
         return data1.size();
     }
-
+    /**To convert timestamp tp date**/
     private String getDate(String time) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(Long.parseLong(time));

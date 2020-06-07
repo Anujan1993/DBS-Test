@@ -1,9 +1,6 @@
 package com.example.dbs.UI;
 
-import androidx.appcompat.app.AlertDialog;
-
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,8 +14,8 @@ import android.widget.TextView;
 import com.example.dbs.R;
 import com.example.dbs.api.NetworkClient;
 import com.example.dbs.api.RequestInterface;
-import com.example.dbs.entitys.Articles;
-import com.example.dbs.entitys.SingleArticles;
+import com.example.dbs.entitys.Article;
+import com.example.dbs.entitys.SingleArticle;
 import com.example.dbs.response.FullArticle;
 import com.squareup.picasso.Picasso;
 
@@ -54,16 +51,18 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_article_view);
+        /*** Custom Toolbar  ***/
         toolbar = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        /*** Get data from Adapter ***/
         final Intent intent = getIntent();
         title= intent.getStringExtra("Title");
         title2= "Edit " + title;
         imageUrl= intent.getStringExtra("Url");
         articleID = intent.getStringExtra("PostID");
+
         imageView = (ImageView) findViewById(R.id.AvterImg);
         imageView2 = (ImageView) findViewById(R.id.AvterImg2);
         header=(TextView)findViewById(R.id.header);
@@ -75,17 +74,18 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
         viewLay = findViewById(R.id.Viewframe);
         editLay = findViewById(R.id.EditFrame);
 
+        /*** Button Click ***/
         edit.setOnClickListener(this);
         cancel.setOnClickListener(this);
         save.setOnClickListener(this);
 
+        /*** Set to layout ***/
         header.setText(title);
         String imageUri = imageUrl;
         Picasso.get().load(imageUri).into(imageView);
         Picasso.get().load(imageUri).into(imageView2);
         newARRAY = new ArrayList<>();
         requestUserInterface = NetworkClient.retrofit.create(RequestInterface.class);
-
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -98,11 +98,10 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
             noIternet();
         }
     }
-
     private void getSinglePost(){
+        /*** Get Single Article from API ***/
         Call<FullArticle> calls = requestUserInterface.groupList(articleID);
         calls.enqueue(new Callback<FullArticle>() {
-
             @Override
             public void onResponse(Call<FullArticle> calls, Response<FullArticle> response) {
                 if(response != null && response.body() != null) {
@@ -116,13 +115,13 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
             }
             @Override
             public void onFailure(Call<FullArticle> calls, Throwable t) {
-                //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
                 dialogBoxBase("Error","Server Requests Not Success");
             }
         });
     }
     private void noIternet() {
-        SingleArticles singleArticles = SingleArticles.find(SingleArticles.class, "articleID ="+articleID).get(0);
+        /*** Get Articles form Local Storage ***/
+        SingleArticle singleArticles = SingleArticle.find(SingleArticle.class, "articleID ="+articleID).get(0);
         if (singleArticles != null){
             singleArticleID = singleArticles.getID();
             text = singleArticles.getText();
@@ -132,7 +131,6 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
         else {
             dialogBoxBase("Error","No data on database");
         }
-
     }
     @Override
     public void onClick(View v) {
@@ -152,11 +150,11 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
                 header.setText(title);
                 break;
             case R.id.Save:
-                SingleArticles singleArticl = SingleArticles.findById(SingleArticles.class, singleArticleID);
+                SingleArticle singleArticl = SingleArticle.findById(SingleArticle.class, singleArticleID);
                 singleArticl.setText(String.valueOf(boDy2));
                 singleArticl.save();
                 String time= String.valueOf(System.currentTimeMillis());
-                Articles articles1 = Articles.find(Articles.class, "articleID ="+singleArticleID).get(0);
+                Article articles1 = Article.find(Article.class, "articleID ="+singleArticleID).get(0);
                 articles1.setLast_update(Integer.valueOf(time));
                 singleArticl.save();
                 dialogBoxBase("Save Status","Your Data Saved Successfully");
