@@ -1,12 +1,14 @@
 package com.example.dbs.UI;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,7 +57,6 @@ public class ListFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         requestInterface = NetworkClient.retrofit.create(RequestInterface.class);
-
         ConnectivityManager cm =
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -63,6 +64,7 @@ public class ListFragment extends Fragment {
                 activeNetwork.isConnectedOrConnecting();
         if (isConnected == true){
             lodeRecyclerView();
+            SingleSave();
         }
         else {
             NoInternetFunction();
@@ -76,63 +78,120 @@ public class ListFragment extends Fragment {
             @Override
             public void onResponse(Call<List<ListArticle>> call, Response<List<ListArticle>> response) {
                // Toast.makeText(getActivity(), "Request Success", Toast.LENGTH_LONG).show();
-                Articles article= new Articles();
-                article.deleteAll(Articles.class);
-                SingleArticles singleArticle = new SingleArticles();
-                singleArticle.deleteAll(SingleArticles.class);
-                for(int i = 0; i<response.body().size(); i++) {
-                    postID = response.body().get(i).getId().intValue();
-                    Title = String.valueOf(response.body().get(i).getTitle());
-                    Date = response.body().get(i).getLastUpdate().intValue();
-                    Body = String.valueOf(response.body().get(i).getShortDescription());
-                    imgUrl = String.valueOf(response.body().get(i).getAvatar());
+                if(response != null && response.body() != null){
+                    //Articles article= new Articles();
+                    //article.deleteAll(Articles.class);
+                    for(int i = 0; i<response.body().size(); i++) {
+                        postID = response.body().get(i).getId().intValue();
+                        Title = String.valueOf(response.body().get(i).getTitle());
+                        Date = response.body().get(i).getLastUpdate().intValue();
+                        Body = String.valueOf(response.body().get(i).getShortDescription());
+                        imgUrl = String.valueOf(response.body().get(i).getAvatar());
 
-                    articles = new Articles();
-                    articles.setArticleID(postID);
-                    articles.setTitle(Title);
-                    articles.setLast_update(Date);
-                    articles.setShort_description(Body);
-                    articles.setAvatar(imgUrl);
-                    articles.save();
-                    Call<FullArticle> calls = requestInterface.groupList(String.valueOf(postID));
-                    calls.enqueue(new Callback<FullArticle>() {
-                        @Override
-                        public void onResponse(Call<FullArticle> calls, Response<FullArticle> responses) {
-                            text = responses.body().getText();
-                            singleArticles = new SingleArticles();
-                            singleArticles.setArticleID(postID);
-                            singleArticles.setText(text);
-                            singleArticles.save();
+                        Articles articles = Articles.find(Articles.class, "articleID ="+ response.body().get(i).getId().intValue()).get(0);
+                       // articles = new Articles();
+                        if (Date == articles.getLast_update()) {
+                            articles.setArticleID(postID);
+                            articles.setTitle(Title);
+                            articles.setLast_update(Date);
+                            articles.setShort_description(Body);
+                            articles.setAvatar(imgUrl);
+                            articles.save();
                         }
-                        @Override
-                        public void onFailure(Call<FullArticle> calls, Throwable t) {
-                            //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
+                        else if(articles == null) {
+                            articles.setArticleID(postID);
+                            articles.setTitle(Title);
+                            articles.setLast_update(Date);
+                            articles.setShort_description(Body);
+                            articles.setAvatar(imgUrl);
+                            articles.save();
                         }
-                    });
+                    }
+                    Data.addAll(response.body());
+                    PostAdaper postAdaper = new PostAdaper(getActivity(),Data);
+                    recyclerView.setAdapter(postAdaper);
                 }
-                Data.addAll(response.body());
-                PostAdaper postAdaper = new PostAdaper(getActivity(),Data);
-                recyclerView.setAdapter(postAdaper);
+                else{
+                    dialogBox("Error","Server Error 429 - Too Many Requests ");
+                }
             }
             @Override
             public void onFailure(Call<List<ListArticle>> call, Throwable t) {
               //  Toast.makeText(getActivity(), "Request Not", Toast.LENGTH_LONG).show();
+                dialogBox("Error","Server Requests Not Success ");
             }
         });
     }
     private void NoInternetFunction(){
         List<Articles> postsList = Articles.listAll(Articles.class);
         ArrayList<ListArticle> postArrayList = new ArrayList<>();
-        for(int i = 0; i<postsList.size(); i++) {
-            ListArticle lp = new ListArticle();
-            lp.setId(postsList.get(i).getArticleID());
-            lp.setTitle(postsList.get(i).getTitle());
-            lp.setLastUpdate(postsList.get(i).getLast_update());
-            lp.setShortDescription(postsList.get(i).getShort_description());
-            lp.setAvatar(postsList.get(i).getAvatar());
-            postArrayList.add(lp);
+        if(postsList.size() != 0) {
+            for (int i = 0; i < postsList.size(); i++) {
+                ListArticle lp = new ListArticle();
+                lp.setId(postsList.get(i).getArticleID());
+                lp.setTitle(postsList.get(i).getTitle());
+                lp.setLastUpdate(postsList.get(i).getLast_update());
+                lp.setShortDescription(postsList.get(i).getShort_description());
+                lp.setAvatar(postsList.get(i).getAvatar());
+                postArrayList.add(lp);
+            }
+            PostAdaper postAdaper = new PostAdaper(getActivity(), postArrayList);
+            recyclerView.setAdapter(postAdaper);
         }
-        PostAdaper postAdaper = new PostAdaper(getActivity(),postArrayList);
-        recyclerView.setAdapter(postAdaper);
+        else{
+            dialogBox("Error","No data on database");
+        }
+    }
+    private void SingleSave(){
+       // SingleArticles singleArticle = new SingleArticles();
+       // singleArticle.deleteAll(SingleArticles.class);
+        for (int i=0; i<Data.size();i++) {
+            Call<FullArticle> calls = requestInterface.groupList(String.valueOf(Data.get(i).getId()));
+            calls.enqueue(new Callback<FullArticle>() {
+                @Override
+                public void onResponse(Call<FullArticle> calls, Response<FullArticle> responses) {
+                    if(responses != null && responses.body() != null) {
+                        text = responses.body().getText();
+                        int id = responses.body().getId();
+                        SingleArticles singleArticles = SingleArticles.find(SingleArticles.class, "articleID ="+id).get(0);
+                        if(text == singleArticles.getText()){
+                            singleArticles.setArticleID(id);
+                            singleArticles.setText(text);
+                            singleArticles.save();
+                        }
+                        else if(singleArticles == null){
+                            //new record save
+                            singleArticles.setArticleID(id);
+                            singleArticles.setText(text);
+                            singleArticles.save();
+                        }
+                    }
+                    else {
+                        dialogBox("Error","Server Error 429 - Too Many Requests");
+                    }
+                }
+                @Override
+                public void onFailure(Call<FullArticle> calls, Throwable t) {
+                    //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
+                    dialogBox("Error","Server Requests Not Success");
+                }
+            });
+        }
+    }
+    private void deleteWhichDeleted(){
+        Articles.deleteAll(Articles.class, "articleID = ?", "31");
+        SingleArticles.deleteAll(SingleArticles.class, "articleID = ?", "31");
+    }
+    private void dialogBox(String boxtitle, String boxMessage){
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setTitle(boxtitle);
+        alertDialog.setMessage(boxMessage);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 }

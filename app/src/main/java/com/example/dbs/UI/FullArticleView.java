@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.dbs.R;
 import com.example.dbs.api.NetworkClient;
@@ -22,12 +21,9 @@ import com.example.dbs.api.RequestInterface;
 import com.example.dbs.entitys.Articles;
 import com.example.dbs.entitys.SingleArticles;
 import com.example.dbs.response.FullArticle;
-import com.orm.query.Condition;
-import com.orm.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,9 +62,7 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final Intent intent = getIntent();
-        // title= intent.getStringExtra("Title");
-        // title2= intent.getStringExtra("Title");
-        title= "Testing";
+        title= intent.getStringExtra("Title");
         title2= "Edit " + title;
         imageUrl= intent.getStringExtra("Url");
         articleID = intent.getStringExtra("PostID");
@@ -113,24 +107,34 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void onResponse(Call<FullArticle> calls, Response<FullArticle> response) {
-                text = response.body().getText();
-                boDy.setText(text);
-                boDy2.setText(text);
+                if(response != null && response.body() != null) {
+                    text = response.body().getText();
+                    boDy.setText(text);
+                    boDy2.setText(text);
+                }
+                else{
+                    dialogBox("Error","Server Error 429 - Too Many Requests");
+                }
             }
             @Override
             public void onFailure(Call<FullArticle> calls, Throwable t) {
-                Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
-
+                //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
+                dialogBox("Error","Server Requests Not Success");
             }
         });
     }
     private void noIternet() {
-        List<SingleArticles> singleArticles = SingleArticles.findWithQuery
-                (SingleArticles.class, "Select * from SingleArticles where articleID = ?", articleID);
-        singleArticleID = singleArticles.get(Integer.parseInt(articleID)).getID();
-        text = singleArticles.get(Integer.parseInt(articleID)).getText();
-        boDy.setText(String.valueOf(text));
-        boDy2.setText(String.valueOf(text));
+        SingleArticles singleArticles = SingleArticles.find(SingleArticles.class, "articleID ="+articleID).get(0);
+        if (singleArticles != null){
+            singleArticleID = singleArticles.getID();
+            text = singleArticles.getText();
+            boDy.setText(String.valueOf(text));
+            boDy2.setText(String.valueOf(text));
+        }
+        else {
+            dialogBox("Error","No data on database");
+        }
+
     }
     @Override
     public void onClick(View v) {
@@ -157,17 +161,7 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                 Articles articles1 = Articles.find(Articles.class, "articleID ="+singleArticleID).get(0);
                 articles1.setLast_update(Integer.valueOf(time));
                 singleArticl.save();
-
-                AlertDialog alertDialog = new AlertDialog.Builder(FullArticleView.this).create();
-                alertDialog.setTitle("Save Status");
-                alertDialog.setMessage("Your Data Saved Successfully");
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                alertDialog.show();
+                dialogBox("Save Status","Your Data Saved Successfully");
                 edit.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.GONE);
                 viewLay.setVisibility(View.VISIBLE);
@@ -175,5 +169,17 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                 header.setText(title);
                 break;
         }
+    }
+    private void dialogBox(String boxtitle, String boxMessage){
+        AlertDialog alertDialog = new AlertDialog.Builder(FullArticleView.this).create();
+        alertDialog.setTitle(boxtitle);
+        alertDialog.setMessage(boxMessage);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 }
