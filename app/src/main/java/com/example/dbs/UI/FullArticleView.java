@@ -1,7 +1,6 @@
 package com.example.dbs.UI;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,7 +28,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FullArticleView extends AppCompatActivity implements View.OnClickListener {
+public class FullArticleView extends BaseActivity implements View.OnClickListener {
 
     private ImageView imageView;
     private ImageView imageView2;
@@ -57,7 +56,6 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.activity_full_article_view);
         toolbar = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -113,13 +111,13 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                     boDy2.setText(text);
                 }
                 else{
-                    dialogBox("Error","Server Error 429 - Too Many Requests");
+                    dialogBoxBase("Error","Server Error 429 - Too Many Requests");
                 }
             }
             @Override
             public void onFailure(Call<FullArticle> calls, Throwable t) {
                 //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
-                dialogBox("Error","Server Requests Not Success");
+                dialogBoxBase("Error","Server Requests Not Success");
             }
         });
     }
@@ -132,7 +130,7 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
             boDy2.setText(String.valueOf(text));
         }
         else {
-            dialogBox("Error","No data on database");
+            dialogBoxBase("Error","No data on database");
         }
 
     }
@@ -161,7 +159,7 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                 Articles articles1 = Articles.find(Articles.class, "articleID ="+singleArticleID).get(0);
                 articles1.setLast_update(Integer.valueOf(time));
                 singleArticl.save();
-                dialogBox("Save Status","Your Data Saved Successfully");
+                dialogBoxBase("Save Status","Your Data Saved Successfully");
                 edit.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.GONE);
                 viewLay.setVisibility(View.VISIBLE);
@@ -169,17 +167,5 @@ public class FullArticleView extends AppCompatActivity implements View.OnClickLi
                 header.setText(title);
                 break;
         }
-    }
-    private void dialogBox(String boxtitle, String boxMessage){
-        AlertDialog alertDialog = new AlertDialog.Builder(FullArticleView.this).create();
-        alertDialog.setTitle(boxtitle);
-        alertDialog.setMessage(boxMessage);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
     }
 }

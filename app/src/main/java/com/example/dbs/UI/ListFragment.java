@@ -65,6 +65,7 @@ public class ListFragment extends Fragment {
         if (isConnected == true){
             lodeRecyclerView();
             SingleSave();
+            deleteWhichDeleted();
         }
         else {
             NoInternetFunction();
@@ -112,13 +113,13 @@ public class ListFragment extends Fragment {
                     recyclerView.setAdapter(postAdaper);
                 }
                 else{
-                    dialogBox("Error","Server Error 429 - Too Many Requests ");
+                    ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Error 429 - Too Many Requests");
                 }
             }
             @Override
             public void onFailure(Call<List<ListArticle>> call, Throwable t) {
               //  Toast.makeText(getActivity(), "Request Not", Toast.LENGTH_LONG).show();
-                dialogBox("Error","Server Requests Not Success ");
+                ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Requests Not Success ");
             }
         });
     }
@@ -139,12 +140,10 @@ public class ListFragment extends Fragment {
             recyclerView.setAdapter(postAdaper);
         }
         else{
-            dialogBox("Error","No data on database");
+            ((BaseActivity)getActivity()).dialogBoxBase("Error","No data on database ");
         }
     }
     private void SingleSave(){
-       // SingleArticles singleArticle = new SingleArticles();
-       // singleArticle.deleteAll(SingleArticles.class);
         for (int i=0; i<Data.size();i++) {
             Call<FullArticle> calls = requestInterface.groupList(String.valueOf(Data.get(i).getId()));
             calls.enqueue(new Callback<FullArticle>() {
@@ -167,31 +166,32 @@ public class ListFragment extends Fragment {
                         }
                     }
                     else {
-                        dialogBox("Error","Server Error 429 - Too Many Requests");
+                        ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Error 429 - Too Many Requests ");
                     }
                 }
                 @Override
                 public void onFailure(Call<FullArticle> calls, Throwable t) {
                     //Toast.makeText(FullArticleView.this, "Request Not", Toast.LENGTH_LONG).show();
-                    dialogBox("Error","Server Requests Not Success");
+                    ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Requests Not Success");
                 }
             });
         }
     }
     private void deleteWhichDeleted(){
-        Articles.deleteAll(Articles.class, "articleID = ?", "31");
-        SingleArticles.deleteAll(SingleArticles.class, "articleID = ?", "31");
-    }
-    private void dialogBox(String boxtitle, String boxMessage){
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setTitle(boxtitle);
-        alertDialog.setMessage(boxMessage);
-        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        alertDialog.show();
+        // If the data was deleted on the saver it will be on local server to delete that on local server
+        ArrayList<Integer> localSore = new ArrayList<>();
+        List<Articles> postsList = Articles.listAll(Articles.class);
+        for (int i=0; i<postsList.size() ;i++){
+            localSore.add(postsList.get(i).getArticleID());
+        }
+        ArrayList<Integer> serverStore = new ArrayList<>();
+        for (int i=0; i<Data.size() ;i++){
+            serverStore.add(Data.get(i).getId());
+        }
+        localSore.removeAll(serverStore);
+        for (int i=0; i<localSore.size();i++){
+            Articles.deleteAll(Articles.class, "articleID = ?", String.valueOf(localSore.get(i)));
+            SingleArticles.deleteAll(SingleArticles.class, "articleID = ?", String.valueOf(localSore.get(i)));
+        }
     }
 }
