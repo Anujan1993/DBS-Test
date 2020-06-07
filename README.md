@@ -12,4 +12,4 @@
 11	if you are in offline  all data will display from local storage.
 12  if one record deleted on API it will be on the Local storage so i delete that once data geting from API
 
-![ScreenShot](https://github.com/i-saumitra/Voice-controlled-MP3-Player/blob/master/screenshot.jpg)
+![ScreenShot](https://github.com/)
