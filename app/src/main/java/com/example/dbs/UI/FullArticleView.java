@@ -17,6 +17,8 @@ import com.example.dbs.api.RequestInterface;
 import com.example.dbs.entitys.Article;
 import com.example.dbs.entitys.SingleArticle;
 import com.example.dbs.response.FullArticle;
+import com.orm.query.Condition;
+import com.orm.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -108,6 +110,11 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
                     text = response.body().getText();
                     boDy.setText(text);
                     boDy2.setText(text);
+
+                    SingleArticle singleArticles = new SingleArticle();
+                    singleArticles.setArticleID(Integer.valueOf(articleID));
+                    singleArticles.setText(text);
+                    singleArticles.save();
                 }
                 else{
                     dialogBoxBase("Error","Server Error 429 - Too Many Requests");
@@ -121,15 +128,15 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
     }
     private void noIternet() {
         /*** Get Articles form Local Storage ***/
-        SingleArticle singleArticles = SingleArticle.find(SingleArticle.class, "articleID ="+articleID).get(0);
-        if (singleArticles != null){
-            singleArticleID = singleArticles.getID();
-            text = singleArticles.getText();
-            boDy.setText(String.valueOf(text));
-            boDy2.setText(String.valueOf(text));
+        ArrayList<SingleArticle> singleArticles = (ArrayList<SingleArticle>) SingleArticle.find(SingleArticle.class, "articleID ="+articleID);
+        if (singleArticles == null || singleArticles.size() == 0){
+            dialogBoxBase("Error","To view this you have to connect your internet, Because you didn't visit...!");
         }
         else {
-            dialogBoxBase("Error","No data on database");
+            singleArticleID = singleArticles.get(0).getID();
+            text = singleArticles.get(0).getText();
+            boDy.setText(String.valueOf(text));
+            boDy2.setText(String.valueOf(text));
         }
     }
     @Override
@@ -151,12 +158,12 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
                 break;
             case R.id.Save:
                 SingleArticle singleArticl = SingleArticle.findById(SingleArticle.class, singleArticleID);
-                singleArticl.setText(String.valueOf(boDy2));
+                singleArticl.setText(boDy2.getText().toString());
                 singleArticl.save();
-                String time= String.valueOf(System.currentTimeMillis());
-                Article articles1 = Article.find(Article.class, "articleID ="+singleArticleID).get(0);
-                articles1.setLast_update(Integer.valueOf(time));
-                singleArticl.save();
+                boDy.setText(boDy2.getText());
+                Article articles1 = Article.find(Article.class, "articleID ="+articleID).get(0);
+                articles1.setLast_update(System.currentTimeMillis());
+                articles1.save();
                 dialogBoxBase("Save Status","Your Data Saved Successfully");
                 edit.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.GONE);

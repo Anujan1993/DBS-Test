@@ -44,7 +44,7 @@ public class ListFragment extends Fragment {
     private String titleOfArticle;
     private String bodyArticle;
     private String text;
-    private Integer dateOfUpdate;
+    private long dateOfUpdate;
     private String imgUrl;
     private RequestInterface requestInterface;
 
@@ -65,7 +65,6 @@ public class ListFragment extends Fragment {
                 activeNetwork.isConnectedOrConnecting();
         if (isConnected == true){
             lodeRecyclerView();
-            SingleSave();
             deleteWhichDeleted();
         }
         else {
@@ -85,31 +84,35 @@ public class ListFragment extends Fragment {
                     for(int i = 0; i<response.body().size(); i++) {
                         idOfArticle = response.body().get(i).getId().intValue();
                         titleOfArticle = String.valueOf(response.body().get(i).getTitle());
-                        dateOfUpdate = response.body().get(i).getLastUpdate().intValue();
+                        dateOfUpdate = response.body().get(i).getLastUpdate();
                         bodyArticle = String.valueOf(response.body().get(i).getShortDescription());
                         imgUrl = String.valueOf(response.body().get(i).getAvatar());
                         /*** Check date of update with local store and API ***/
-                        Article articles = Article.find(Article.class, "articleID ="+ response.body().get(i).getId().intValue()).get(0);
-                        if (dateOfUpdate <= articles.getLast_update()) {
-                            articles.setArticleID(idOfArticle);
-                            articles.setTitle(titleOfArticle);
-                            articles.setLast_update(dateOfUpdate);
-                            articles.setShort_description(bodyArticle);
-                            articles.setAvatar(imgUrl);
-                            articles.save();
+                        List<Article> articles = Article.find(Article.class, "articleID ="+ response.body().get(i).getId().intValue());
+                        if(articles == null) {
+                            Article article= new Article();
+                            article.setArticleID(idOfArticle);
+                            article.setTitle(titleOfArticle);
+                            article.setLast_update(dateOfUpdate);
+                            article.setShort_description(bodyArticle);
+                            article.setAvatar(imgUrl);
+                            article.save();
                         }
-                        else if(articles == null) {
-                            articles.setArticleID(idOfArticle);
-                            articles.setTitle(titleOfArticle);
-                            articles.setLast_update(dateOfUpdate);
-                            articles.setShort_description(bodyArticle);
-                            articles.setAvatar(imgUrl);
-                            articles.save();
+                        else {
+                            if (dateOfUpdate <= articles.get(0).getLast_update()) {
+                                long aArticleID = articles.get(0).getID();
+                                Article article1 = Article.findById(Article.class, aArticleID);
+                                article1.setTitle(titleOfArticle);
+                                article1.setLast_update(dateOfUpdate);
+                                article1.setShort_description(bodyArticle);
+                                article1.setAvatar(imgUrl);
+                                article1.save();
+                            }
                         }
                     }
                     dateArray.addAll(response.body());
-                    Collections.sort(dateArray,
-                            Comparator.comparingInt(ListArticle::getLastUpdate).reversed());
+               //     Collections.sort(dateArray,
+                 //           Comparator.comparingInt(ListArticle::getLastUpdate).reversed());
                     PostAdaper postAdaper = new PostAdaper(getActivity(),dateArray);
                     recyclerView.setAdapter(postAdaper);
                 }
@@ -119,7 +122,6 @@ public class ListFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<List<ListArticle>> call, Throwable t) {
-              //  Toast.makeText(getActivity(), "Request Not", Toast.LENGTH_LONG).show();
                 ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Requests Not Success ");
             }
         });
@@ -127,7 +129,6 @@ public class ListFragment extends Fragment {
     private void NoInternetFunction(){
         /*** No Internet But get data from Local Storage ***/
         List<Article> postsList = Select.from(Article.class).orderBy("last_update DESC").list();
-        //List<Articles> postsList = Articles.listAll(Articles.class);
         ArrayList<ListArticle> postArrayList = new ArrayList<>();
         if(postsList.size() != 0) {
             for (int i = 0; i < postsList.size(); i++) {
@@ -146,43 +147,8 @@ public class ListFragment extends Fragment {
             ((BaseActivity)getActivity()).dialogBoxBase("Error","No data on database ");
         }
     }
-    private void SingleSave(){
-        /*** Get all single article for store to see when Internet off ***/
-        for (int i=0; i<dateArray.size();i++) {
-            Call<FullArticle> calls = requestInterface.groupList(String.valueOf(dateArray.get(i).getId()));
-            calls.enqueue(new Callback<FullArticle>() {
-                @Override
-                public void onResponse(Call<FullArticle> calls, Response<FullArticle> responses) {
-                    if(responses != null && responses.body() != null) {
-                        text = responses.body().getText();
-                        int id = responses.body().getId();
-                        SingleArticle singleArticles = SingleArticle.find(SingleArticle.class, "articleID ="+id).get(0);
-                        if(text == singleArticles.getText()){
-                            singleArticles.setArticleID(id);
-                            singleArticles.setText(text);
-                            singleArticles.save();
-                        }
-                        else if(singleArticles == null){
-                            //new record save
-                            singleArticles.setArticleID(id);
-                            singleArticles.setText(text);
-                            singleArticles.save();
-                        }
-                    }
-                    else {
-                        ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Error 429 - Too Many Requests ");
-                    }
-                }
-                @Override
-                public void onFailure(Call<FullArticle> calls, Throwable t) {
-                    ((BaseActivity)getActivity()).dialogBoxBase("Error","Server Requests Not Success");
-                }
-            });
-        }
-    }
     private void deleteWhichDeleted(){
         /*** if any data deleted on API delete from Local Store ***/
-        // If the data was deleted on the saver it will be on local server to delete that on local server
         ArrayList<Integer> localSore = new ArrayList<>();
         List<Article> postsList = Article.listAll(Article.class);
         for (int i=0; i<postsList.size() ;i++){

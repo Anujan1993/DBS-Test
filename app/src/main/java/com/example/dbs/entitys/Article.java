@@ -13,7 +13,7 @@ public class Article extends SugarRecord {
     @Column(name = "title")
     private String title;
     @Column(name = "last_update")
-    private Integer last_update;
+    private long last_update;
     @Column(name = "short_description")
     private String short_description;
     @Column(name = "avatar")
@@ -40,9 +40,9 @@ public class Article extends SugarRecord {
 
     public void setTitle(String title) { this.title = title;  }
 
-    public Integer getLast_update() { return last_update;  }
+    public long getLast_update() { return last_update;  }
 
-    public void setLast_update(Integer last_update) { this.last_update = last_update;  }
+    public void setLast_update(long last_update) { this.last_update = last_update;  }
 
     public String getShort_description() { return short_description;  }
 

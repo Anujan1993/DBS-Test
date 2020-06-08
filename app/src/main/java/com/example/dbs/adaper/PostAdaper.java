@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dbs.R;
@@ -41,12 +42,12 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
     @Override
     public void onBindViewHolder(@NonNull postViewAdapter holder, final int position) {
         holder.textView.setText(data1.get(position).getTitle());
-        String resultDate = getDate(String.valueOf(data1.get(position).getLastUpdate().intValue()));
+        String resultDate = getDate(String.valueOf(data1.get(position).getLastUpdate()));
         holder.date.setText(resultDate);
         holder.shortDec.setText(data1.get(position).getShortDescription());
         String imageUri = data1.get(position).getAvatar();
         Picasso.get().load(imageUri).into(holder.imageView);
-        holder.textView.setOnClickListener(new View.OnClickListener() {
+        holder.clickCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, FullArticleView.class);
@@ -73,12 +74,14 @@ public class PostAdaper extends RecyclerView.Adapter<PostAdaper.postViewAdapter>
         private  TextView date;
         private  TextView shortDec;
         private ImageView imageView;
+        private CardView clickCard;
         public postViewAdapter(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.Title);
             date = itemView.findViewById(R.id.Date);
             shortDec = itemView.findViewById(R.id.ShortDec);
             imageView = itemView.findViewById(R.id.AvterImg);
+            clickCard = itemView.findViewById(R.id.clickCard);
 
         }
     }

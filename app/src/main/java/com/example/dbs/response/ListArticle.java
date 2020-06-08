@@ -13,7 +13,7 @@ public class ListArticle {
     private String title;
     @SerializedName("last_update")
     @Expose
-    private Integer lastUpdate;
+    private long lastUpdate;
     @SerializedName("short_description")
     @Expose
     private String shortDescription;
@@ -29,9 +29,9 @@ public class ListArticle {
 
     public void setTitle(String title) {  this.title = title;  }
 
-    public Integer getLastUpdate() {  return lastUpdate;  }
+    public long getLastUpdate() {  return lastUpdate;  }
 
-    public void setLastUpdate(Integer lastUpdate) {  this.lastUpdate = lastUpdate;  }
+    public void setLastUpdate(long lastUpdate) {  this.lastUpdate = lastUpdate;  }
 
     public String getShortDescription() { return shortDescription;   }
 

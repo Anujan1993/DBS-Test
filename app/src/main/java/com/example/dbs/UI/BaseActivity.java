@@ -20,7 +20,7 @@ public class BaseActivity extends AppCompatActivity {
         /*** Get Articles for list ***/
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setCancelable(false)
-                .setNegativeButton("NO", null)
+                .setNegativeButton("Ok", null)
                 .setTitle(title)
                 .setMessage(BodyMessage)
                 .show();
