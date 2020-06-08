@@ -12,5 +12,8 @@
 11	if you are in offline  all data will display from local storage.
 12  if one record deleted on API it will be on the Local storage so i delete that once data geting from API
 
-When you are in offline but no data saved on database
-![ScreenShot](https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093430_com.example.dbs.jpg)
+When you are in offline but no data saved on database<br>
+<img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093430_com.example.dbs.jpg" alt="alt text" width="150px">
+
+
+
