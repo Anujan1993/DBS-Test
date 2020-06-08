@@ -11,9 +11,41 @@
 10	if you click the save button on the local storage it will store and update last update time also.<br>
 11	if you are in offline  all data will display from local storage.
 12  if one record deleted on API it will be on the Local storage so i delete that once data geting from API
-
-When you are in offline but no data saved on database<br>
-<img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093430_com.example.dbs.jpg" alt="alt text" width="150px">
-
-
-
+<table>
+  <tr>
+    <td width="25%">
+      <h4>When you are in offline but no data saved on database<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093430_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>If anyone trying to add new article<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093437_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>Header view<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_093440_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>When page load List Article When online or Offline<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_094830_com.example.dbs.jpg" alt="alt text">
+    </td>
+  </tr>
+  <tr>
+    <td width="25%">
+      <h4>Once click one Article full view<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_094837_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>After click edit view Editable<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_094841_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>if click save<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_115721_com.example.dbs.jpg" alt="alt text">
+    </td>
+    <td width="25%">
+      <h4>If server request limit finished<h4></br>
+      <img src="https://github.com/Anujan1993/DBS-Test/blob/master/screenshots/Screenshot_20200608_120738_com.example.dbs.jpg" alt="alt text">
+    </td>
+  </tr>
+</table
