@@ -89,7 +89,7 @@ public class ListFragment extends Fragment {
                         imgUrl = String.valueOf(response.body().get(i).getAvatar());
                         /*** Check date of update with local store and API ***/
                         List<Article> articles = Article.find(Article.class, "articleID ="+ response.body().get(i).getId().intValue());
-                        if(articles == null) {
+                        if(articles == null || articles.size() == 0) {
                             Article article= new Article();
                             article.setArticleID(idOfArticle);
                             article.setTitle(titleOfArticle);
