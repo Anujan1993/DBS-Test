@@ -111,8 +111,8 @@ public class ListFragment extends Fragment {
                         }
                     }
                     dateArray.addAll(response.body());
-               //     Collections.sort(dateArray,
-                 //           Comparator.comparingInt(ListArticle::getLastUpdate).reversed());
+                    Collections.sort(dateArray,
+                            Comparator.comparingLong(ListArticle::getLastUpdate).reversed());
                     PostAdaper postAdaper = new PostAdaper(getActivity(),dateArray);
                     recyclerView.setAdapter(postAdaper);
                 }
