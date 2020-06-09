@@ -22,6 +22,7 @@ import com.orm.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -110,11 +111,21 @@ public class FullArticleView extends BaseActivity implements View.OnClickListene
                     text = response.body().getText();
                     boDy.setText(text);
                     boDy2.setText(text);
-
-                    SingleArticle singleArticles = new SingleArticle();
-                    singleArticles.setArticleID(Integer.valueOf(articleID));
-                    singleArticles.setText(text);
-                    singleArticles.save();
+                    List<SingleArticle> singleArticle = SingleArticle.find(SingleArticle.class, "articleID ="+articleID );
+                    if(singleArticle == null || singleArticle.size() == 0) {
+                        Article article= new Article();
+                        SingleArticle singleArticles = new SingleArticle();
+                        singleArticles.setArticleID(Integer.valueOf(articleID));
+                        singleArticles.setText(text);
+                        singleArticles.save();
+                    }
+                    else {
+                        long aArticleID = singleArticle.get(0).getID();
+                        SingleArticle singleArticle1 = SingleArticle.findById(SingleArticle.class, aArticleID);
+                        singleArticle1.setArticleID(Integer.valueOf(articleID));
+                        singleArticle1.setText(text);
+                        singleArticle1.save();
+                    }
                 }
                 else{
                     dialogBoxBase("Error","Server Error 429 - Too Many Requests");
